@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:20-alpine
 RUN apk add --no-cache git wget python3 make g++ chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
