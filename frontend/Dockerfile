@@ -1,6 +1,7 @@
 FROM node:18-alpine AS builder
 WORKDIR /app
 COPY frontend/package*.json ./
+RUN apk add --no-cache git
 RUN npm install
 COPY frontend/ ./
 ARG REACT_APP_BACKEND_URL
