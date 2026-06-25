@@ -4,7 +4,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 WORKDIR /app
 COPY backend/package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 COPY backend/ ./
 RUN npm run build
 EXPOSE 8080
