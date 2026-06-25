@@ -3,9 +3,9 @@ RUN apk add --no-cache wget python3 make g++ chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 WORKDIR /app
-COPY package*.json ./
+COPY backend/package*.json ./
 RUN npm install
-COPY . .
+COPY backend/ ./
 RUN npm run build
 EXPOSE 8080
 CMD ["npm", "start"]
