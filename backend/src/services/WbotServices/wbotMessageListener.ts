@@ -1898,6 +1898,55 @@ const filterMessages = (msg: WAMessage): boolean => {
 
 const wbotMessageListener = async (wbot: Session, companyId: number): Promise<void> => {
   try {
+    wbot.ev.on('messaging-history.set', async ({ chats, contacts, messages, isLatest }) => {
+      try {
+        logger.info(`[HISTORICO] Sincronização iniciada. Recebidos ${messages?.length || 0} msgs, ${contacts?.length || 0} contatos.`);
+
+        // Filtro de 30 dias (em milissegundos)
+        const trintaDiasEmMs = 30 * 24 * 60 * 60 * 1000;
+        const limiteTempo = Date.now() - trintaDiasEmMs;
+
+        // Salvar contatos importantes recebidos no historico
+        if (contacts && contacts.length > 0) {
+          for (const contact of contacts) {
+            try {
+              const contactData = {
+                name: contact.name || contact.id.replace(/\D/g, ""),
+                number: contact.id.replace(/\D/g, ""),
+                profilePicUrl: "",
+                isGroup: contact.id.includes("g.us"),
+                companyId
+              };
+              await CreateOrUpdateContactService(contactData);
+            } catch (err) {
+              logger.warn(`Erro ao salvar contato no historico: ${err}`);
+            }
+          }
+        }
+
+        // Processar mensagens recentes (com menos de 30 dias)
+        if (messages && messages.length > 0) {
+          let countSaved = 0;
+          for (const msg of messages) {
+            const msgTimestamp = (msg.messageTimestamp as number) * 1000;
+            if (msgTimestamp >= limiteTempo) {
+              const messageExists = await Message.count({
+                where: { id: msg.key.id!, companyId }
+              });
+
+              if (!messageExists) {
+                await handleMessage(msg, wbot, companyId);
+                countSaved++;
+              }
+            }
+          }
+          logger.info(`[HISTORICO] Sincronização concluída. ${countSaved} mensagens processadas dos últimos 30 dias.`);
+        }
+      } catch (err) {
+        logger.error(`[HISTORICO] Erro ao sincronizar histórico: ${err}`);
+      }
+    });
+
     wbot.ev.on("messages.upsert", async (messageUpsert: ImessageUpsert) => {
       const messages = messageUpsert.messages
         .filter(filterMessages)
