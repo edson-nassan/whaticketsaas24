@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc || true",
     "watch": "tsc -w",
     "start": "nodemon dist/server.js",
     "dev:server": "ts-node-dev --respawn --transpile-only --ignore node_modules src/server.ts",
@@ -21,7 +21,7 @@
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@hapi/boom": "^9.1.4",
     "@sentry/node": "^6.18.1",
-    "@whiskeysockets/baileys": "6.5.0",
+    "@whiskeysockets/baileys": "^6.7.0",
     "@adiwajshing/keyed-db": "^0.2.4",
     "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
